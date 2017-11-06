@@ -2,15 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player.cs : MonoBehaviour {
+public class Player : MonoBehaviour {
 
+	public float speed = 3f;
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update () 
+	{
+		// Debug.Lo
+		transform.position += Vector3.right * Input.GetAxis("Horizontal") * speed * Time.deltaTime;
 		
 	}
 }
