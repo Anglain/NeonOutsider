@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
-
+public class Player : MonoBehaviour 
+{
 	public float speed = 100f;
 	public float jumpFactor = 1f;
 	int framesToJumpAgain = 10;
 	int framesPast = 0;
-	Rigidbody2D rb;
 	bool jumping = false;
+	Rigidbody2D rb;
 	// Use this for initialization
 	void Start () 
 	{
@@ -19,8 +19,6 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		// Debug.Lo
-		// transform.position += Vector3.right * Input.GetAxis("Horizontal") * speed * Time.deltaTime;
 	}
 
 	void FixedUpdate()
