@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour 
 {
+	public GameObject shieldPrefab;
 	public float speed = 100f;
 	public float jumpFactor = 1f;
 	int framesToJumpAgain = 10;
@@ -19,6 +20,10 @@ public class Player : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
+		if(Input.GetKeyDown(KeyCode.F))
+		{
+			Instantiate(shieldPrefab, this.transform.position, Quaternion.identity);
+		}
 	}
 
 	void FixedUpdate()
