@@ -79,7 +79,8 @@ public class Shield : MonoBehaviour, IRewindable
 		Debug.Log("object inside shield : " + closestGo);
 		if(closestGo != null)
 		{
-			this.gameObject.transform.parent = closestGo.transform;
+			transform.parent = closestGo.transform;
+			transform.position = closestGo.transform.position;	// center it on parent's object
 			// ignore collisions between shield and it's new parent object
 			Collider2D shieldCol = GetComponent<Collider2D>();
 			Collider2D parentCol = closestGo.GetComponent<Collider2D>();
