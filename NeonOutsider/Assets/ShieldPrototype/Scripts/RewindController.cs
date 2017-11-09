@@ -8,65 +8,53 @@ using UnityEngine;
 /// </summary>
 public class RewindController : Singleton<RewindController>
 {
-	private int maxUsageEntries = 3;
-	private LinkedList<SkillUsage> skillMemory;
+	public RewindTimer timer;
+	private const int MAX_USAGE_ENTRIES = 3;
+	private LinkedList<IRewindable> skillMemory;
 
+	protected override void Awake()
+	{
+		base.Awake();
+		skillMemory = new LinkedList<IRewindable>();
+	}
+	
 	public void DuplicateLastSkill()
 	{
-		SkillUsage lastSkill = skillMemory.First.Value;
+		IRewindable lastSkill = skillMemory.First.Value;
 		skillMemory.RemoveFirst();
 
-		switch(lastSkill.skillType)
+		lastSkill.Rewind();
+
+		Debug.Log("Timer pos : " + timer.transform.position);
+
+		
+		if(skillMemory.Count != 0)	//move timer to older skill location
 		{
-			case Skill.Shield:
-			case Skill.Wall:
-			{
-
-				break;
-			}
-
-			case Skill.Gun:
-			{
-				break;
-			}
+			IRewindable olderSkill = skillMemory.First.Value;
+			timer.transform.position = olderSkill.UsagePosition();
+		}
+		else	// hide timer
+		{
+			timer.gameObject.SetActive(false);
 		}
 	}
 	
-	public void RememberSkillUsage(SkillUsage usage)
+	public void RememberSkillUsage(IRewindable skill)
 	{
 		int skillsRemembered = skillMemory.Count;
-		skillMemory.AddFirst(usage);
+		skillMemory.AddFirst(skill);
 
-		if(skillsRemembered >= maxUsageEntries)
+		// place timer in needed location
+		timer.gameObject.transform.position = skill.UsagePosition();
+		// if there where no usages of skill in stack, the timer is hidden
+		timer.gameObject.SetActive(true);
+
+		if(skillsRemembered >= MAX_USAGE_ENTRIES)
 		{
+			// clean up the gameobject
+			IRewindable lastSkill = skillMemory.Last.Value;
+			lastSkill.Dispose();
 			skillMemory.RemoveLast();
 		}
 	}
-}
-
-/// <summary>
-/// Keeps all data about skill usage 
-/// </summary>
-public struct SkillUsage
-{
-	// public readonly Vector3 position;
-	public readonly GameObject gameObject;
-	public readonly Skill skillType;
-
-	/// <summary>
-	/// pass a prefab of wall or shield when they are deactivated
-	/// or null otherwise
-	/// </summary>
-	/// <param name="gameObject"></param>
-	/// <param name="skillType"></param>
-	public SkillUsage(GameObject gameObject, Skill skillType)
-	{
-		this.gameObject = gameObject;
-		this.skillType = skillType;
-	}
-}
-
-public enum Skill
-{
-	Shield, Wall, Gun
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Player : MonoBehaviour 
 {
@@ -22,7 +23,16 @@ public class Player : MonoBehaviour
 	{
 		if(Input.GetKeyDown(KeyCode.F))
 		{
-			Instantiate(shieldPrefab, this.transform.position, Quaternion.identity);
+			GameObject shieldInstance = Instantiate(shieldPrefab, this.transform.position, Quaternion.identity);
+			shieldInstance.SetActive(true);	// must set it active from there or the Start will no be called
+			// Shield shieldScript = shieldInstance.GetComponent<Shield>();
+			// Assert.IsNotNull(shieldScript);
+			// shieldScript.
+		}
+
+		if(Input.GetKeyDown(KeyCode.R))
+		{
+			RewindController.Instance.DuplicateLastSkill();
 		}
 	}
 
