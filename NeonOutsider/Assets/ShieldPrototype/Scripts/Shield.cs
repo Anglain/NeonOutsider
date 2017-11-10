@@ -100,6 +100,7 @@ public class Shield : MonoBehaviour, IRewindable
 			yield return new WaitForEndOfFrame();
 		}
 
+		// stop ignoring collisions with parent
 		if(deleteOnEnd)
 		{
 			Dispose();

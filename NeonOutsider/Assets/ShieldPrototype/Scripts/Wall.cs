@@ -2,15 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wall : MonoBehaviour {
+public class Wall : MonoBehaviour, IRewindable 
+{
+   void Start()
+   {
+	   
+   }
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+	#region IRewindable members
+
+    public void Rewind()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Vector3 UsagePosition()
+    {
+        throw new System.NotImplementedException();
+    }
+
+	 public void Dispose()
+    {
+        throw new System.NotImplementedException();
+    }
+
+	#endregion
+
 }
