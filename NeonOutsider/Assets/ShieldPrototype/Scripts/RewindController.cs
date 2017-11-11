@@ -20,14 +20,19 @@ public class RewindController : Singleton<RewindController>
 	
 	public void DuplicateLastSkill()
 	{
+		if(skillMemory.Count == 0)
+		{
+			Debug.LogError("Called DuplicateLastSkill() with no skills in stack");
+			return;
+		}
+
 		IRewindable lastSkill = skillMemory.First.Value;
 		skillMemory.RemoveFirst();
 
 		lastSkill.Rewind();
-
-		Debug.Log("Timer pos : " + timer.transform.position);
-
+		// Debug.Log("Timer pos : " + timer.transform.position);
 		
+		timer.Reset();
 		if(skillMemory.Count != 0)	//move timer to older skill location
 		{
 			IRewindable olderSkill = skillMemory.First.Value;

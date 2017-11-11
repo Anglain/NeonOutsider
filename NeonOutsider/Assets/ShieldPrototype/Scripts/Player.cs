@@ -6,12 +6,19 @@ using UnityEngine.Assertions;
 public class Player : MonoBehaviour 
 {
 	public GameObject shieldPrefab;
+	public RewindTimer rewindTimer;
+
+	private bool rewindFillStated;
+
+	#region  movement vars
 	public float speed = 100f;
 	public float jumpFactor = 1f;
 	int framesToJumpAgain = 10;
 	int framesPast = 0;
 	bool jumping = false;
 	Rigidbody2D rb;
+	#endregion
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -32,8 +39,22 @@ public class Player : MonoBehaviour
 
 		if(Input.GetKeyDown(KeyCode.R))
 		{
-			RewindController.Instance.DuplicateLastSkill();
+			if(rewindFillStated == false)
+			{
+				rewindTimer.StartFill();
+				rewindFillStated = true;
+			}
+			else
+			{
+				if(Input.GetKeyDown(KeyCode.R) == false)	// if user stopped pressing key, rewind
+				{
+					rewindTimer.FinishFill();
+					rewindFillStated = false;
+				}
+			}
 		}
+
+
 	}
 
 	void FixedUpdate()
