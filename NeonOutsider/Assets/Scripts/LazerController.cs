@@ -36,28 +36,43 @@ public class LazerController : MonoBehaviour {
 
 	// Prevent frome creating new lazer bullet
 	bool isShooting = false;
+	bool keyUp = false;
 
 	private KeyCode pressed = KeyCode.None;
 
 	void FixedUpdate () {
 		if ((Input.GetKey (frontShootKey)) && !isShooting) { 
 			isShooting = true;
-			StartCoroutine ("DurationCalculate");
 			RightShoot ();
 			StartCoroutine (Timer(DIFF - .05f));
 		}
 		if ((Input.GetKey (upShootKey))&& !isShooting ) {
 			isShooting = true;
-			StartCoroutine ("DurationCalculate");
 			UpShoot ();
 			StartCoroutine (Timer(DIFF - .05f));
 		}
 
 		if ((Input.GetKey (rewindKey)) && previousShootCoords.coordinates != Vector2.zero) {
-			Rewind ();
+				Rewind ();
 		}
 	}
 
+	void Update(){
+		if ((Input.GetKey (frontShootKey)) && pressed == KeyCode.None) { 
+			pressed = frontShootKey;
+			StartCoroutine ( DurationCalculate());
+		}
+		if ((Input.GetKey (upShootKey)) && pressed == KeyCode.None) {
+			pressed = upShootKey;
+			StartCoroutine ( DurationCalculate());
+		}
+
+		if (Input.GetKeyUp (pressed)) {
+			keyUp = true;
+		}
+	}
+
+	// Delay for shooting
 	private IEnumerator Timer(float time){
 		yield return new WaitForSeconds(time);
 		isShooting = false;
@@ -84,7 +99,7 @@ public class LazerController : MonoBehaviour {
 	//
 	//	REWIND PART
 	//
-	LineCoordinates previousShootCoords;
+	LineCoordinates previousShootCoords = new LineCoordinates(Vector2.zero, Vector2.zero);
 
 	Vector3 UsagePosition(){
 		Vector3 usagePosition = previousShootCoords.coordinates;
@@ -94,24 +109,31 @@ public class LazerController : MonoBehaviour {
 	public void Rewind(){
 		LineCoordinates tmp = previousShootCoords;
 		previousShootCoords = new LineCoordinates (Vector2.zero, Vector2.zero);
-		RewindShoot(duration, tmp);
+		StartCoroutine(RewindShoot(duration, tmp));
 	}
 
-	private void RewindShoot(float duration, LineCoordinates previousShootCoords){
-		float thisDuration = duration;
-		int n = (int)(thisDuration / (DIFF - .05f));
-		for (int i = 0; i < n; i++) {
+	private IEnumerator RewindShoot(float duration, LineCoordinates previousShootCoords){
+		float thisDuration = duration; //to save localy
+		float timer = 0f;
+		while (timer <= duration){
 			Shoot (previousShootCoords);
-			StartCoroutine (Timer(DIFF - .05f));
+			yield return new WaitForSeconds(DIFF - .05f);
+			timer += (DIFF - .05f) + Time.deltaTime;
+			print (duration + " t: " + timer);
 		}
+		yield break;
 	}
 
-	float duration;
-	private IEnumerator DurationCalculate(){
+	float duration; // The last duration of lazer
+	private IEnumerator DurationCalculate(){ // Calculate how long player pressed key (was shooting)
 		duration = 0f;
 		while(true) {
-			if (Input.GetKeyUp (pressed)) {
+			//print (duration);
+			//print (keyUp);
+			if (keyUp) {
 				pressed = KeyCode.None;
+				print (duration);
+				keyUp = false;
 				yield break;
 			}
 			yield return null;
@@ -132,7 +154,6 @@ public class LazerController : MonoBehaviour {
 		GameObject lazerBullet = new GameObject();
 		lazerBullet.AddComponent<LineRenderer> ();
 		SetLazerSettings(lazerBullet.GetComponent<LineRenderer> ());
-
 		Shoot (bulletCoordsStart, lazerBullet);
 	}
 		
@@ -151,10 +172,10 @@ public class LazerController : MonoBehaviour {
 
 		// Gets the closest collision poin
 		LineCoordinates bulletCoordsNext;
-		if ((hitBlock.point - bulletCoordsStart.coordinates).magnitude
-			> (hitReflect.point - bulletCoordsStart.coordinates).magnitude) {
+		if ((hitBlock.point - bulletCoordsStart.coordinates).magnitude 
+			> (hitReflect.point - bulletCoordsStart.coordinates).magnitude) { // if it is reflecting layer
 			bulletCoordsNext = new LineCoordinates (hitReflect.point, Vector2.Reflect (bulletCoordsStart.direction, hitReflect.normal));
-		}  else { 
+		}  else { // if it is blocking layer -> we don't need to reflect lazer -> that's why Vector2.zero
 			bulletCoordsNext = new LineCoordinates (hitBlock.point, Vector2.zero);
 		}
 
@@ -184,13 +205,13 @@ public class LazerController : MonoBehaviour {
 		bool nextCoroutineStarted = false;
 
 		while (true) {
-			addDist = from.direction * speed * Time.deltaTime;
+			addDist = from.direction * speed * Time.deltaTime; // Calculate the delta of move
 			timer += Time.deltaTime;
 				
-			// Moves the tail of the bullet
+
 			if (timer >= DIFF) { // the difference between head and tail is 0.5f sec
 				timerTail += Time.deltaTime;
-				tail += addDist;
+				tail += addDist; // Moves the tail of the bullet
 				if (timerTail >= time) {
 					lr.enabled = false;
 					Destroy (lazerBullet);
@@ -198,16 +219,16 @@ public class LazerController : MonoBehaviour {
 				}
 			}
 				
-			//Moves the head of the bullet
+		
 			timerHead += Time.deltaTime;
 			if (timerHead <= time) {
-				head += addDist;
+				head += addDist; //Moves the head of the bullet
 			}  else {
 				head = to.coordinates;
 				// If it is reflecting layer -> start new shoot from this point
 				if (!nextCoroutineStarted && to.direction != Vector2.zero) {
-					nextCoroutineStarted = true;
-					Shoot (to);
+					nextCoroutineStarted = true; 
+					Shoot (to); // The next leg of lazer 
 				}
 			}
 
@@ -236,6 +257,10 @@ public class LazerController : MonoBehaviour {
 		lazer.material = material;
 		lazer.useWorldSpace = true;
 		lazer.enabled = true;
+
+		if (material == null) {
+			Debug.LogError ("No material for lazer! [LAZER_CONTROLLER.CS]");
+		}
 	}
 }
 
