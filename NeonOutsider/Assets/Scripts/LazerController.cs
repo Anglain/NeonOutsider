@@ -78,19 +78,19 @@ public class LazerController : MonoBehaviour {
 		isShooting = false;
 	}
 
-	void RightShoot(){
+	public void RightShoot(){
 		// Save previous shoot
 		previousShootCoords = new LineCoordinates(transform.position, transform.right);
 		Shoot(new LineCoordinates(transform.position, transform.right));
 	}	
 
-	void LeftShoot(){
+	public void LeftShoot(){
 		// Save previous shoot
 		previousShootCoords = new LineCoordinates(transform.position, -transform.right);
 		Shoot(new LineCoordinates(transform.position, transform.right));
 	}	
 
-	void UpShoot(){
+	public void UpShoot(){
 		// Save previous shoot
 		previousShootCoords = new LineCoordinates(transform.position, transform.up);
 		Shoot(new LineCoordinates(transform.position, transform.up));
@@ -214,7 +214,12 @@ public class LazerController : MonoBehaviour {
 				tail += addDist; // Moves the tail of the bullet
 				if (timerTail >= time) {
 					lr.enabled = false;
-					Destroy (lazerBullet);
+
+					if (to.direction == Vector2.zero) {
+						gameObject.SetActive (false);
+					}
+					//Destroy (lazerBullet);
+
 					yield break;
 				}
 			}
