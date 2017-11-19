@@ -50,7 +50,6 @@ public class RewindTimer : MonoBehaviour
     
     private IEnumerator FillStartCoroutine()
     {
-        Debug.Log(innerImage.fillAmount);
         while(innerImage.fillAmount < 1.0f)
         {
             innerImage.fillAmount +=  (Time.deltaTime / fillDuration);

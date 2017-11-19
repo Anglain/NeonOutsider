@@ -16,7 +16,6 @@ public class Shield : MonoBehaviour, IRewindable
 	
 	void Start()
 	{
-		Debug.Log("Start");
 		TurnOnForDuration(false);
 	}
 
@@ -76,7 +75,6 @@ public class Shield : MonoBehaviour, IRewindable
 			}
 		}
 
-		Debug.Log("object inside shield : " + closestGo);
 		if(closestGo != null)
 		{
 			transform.parent = closestGo.transform;

@@ -6,9 +6,10 @@ using UnityEngine.Assertions;
 public class Player : MonoBehaviour 
 {
 	public GameObject shieldPrefab;
+	public GameObject wallPrefab;
 	public RewindTimer rewindTimer;
 
-	private bool rewindFillStated;
+	private bool rewindFillStarted;
 
 	#region  movement vars
 	public float speed = 100f;
@@ -20,6 +21,7 @@ public class Player : MonoBehaviour
 	#endregion
 
 	// Use this for initialization
+	
 	void Start () 
 	{
 		rb = GetComponent<Rigidbody2D>();
@@ -28,33 +30,51 @@ public class Player : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
+		if(Input.GetMouseButtonDown(1))
+		{
+			GameObject wallInstance = Instantiate(wallPrefab, this.transform.position, Quaternion.identity);
+			Wall wallScript = wallInstance.GetComponent<Wall>();
+			wallScript.Place(this.transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
+
+			
+		}
+
 		if(Input.GetKeyDown(KeyCode.F))
 		{
 			GameObject shieldInstance = Instantiate(shieldPrefab, this.transform.position, Quaternion.identity);
-			shieldInstance.SetActive(true);	// must set it active from there or the Start will no be called
-			// Shield shieldScript = shieldInstance.GetComponent<Shield>();
-			// Assert.IsNotNull(shieldScript);
-			// shieldScript.
+			// shieldInstance.SetActive(true);	// must set it active from there or the Start will no be called
 		}
 
 		if(Input.GetKeyDown(KeyCode.R))
 		{
-			if(rewindFillStated == false)
+			if(rewindFillStarted == false)
 			{
 				rewindTimer.StartFill();
-				rewindFillStated = true;
+				rewindFillStarted = true;
 			}
 			else
 			{
 				if(Input.GetKeyDown(KeyCode.R) == false)	// if user stopped pressing key, rewind
 				{
 					rewindTimer.FinishFill();
-					rewindFillStated = false;
+					rewindFillStarted = false;
 				}
 			}
 		}
 
-
+		if(rewindFillStarted == false )	// start filling timer
+		{
+			if(Input.GetKeyDown(KeyCode.R))
+			{
+				rewindTimer.StartFill();
+				rewindFillStarted = true;
+			}
+		}
+		else if (Input.GetKey(KeyCode.R) == false)	// if user stopped pressing key, rewind
+		{
+			rewindTimer.FinishFill();
+			rewindFillStarted = false;
+		}
 	}
 
 	void FixedUpdate()
