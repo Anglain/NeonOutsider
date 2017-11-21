@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/IvyScene.unity
+- path: Assets/ShieldPrototype/Scenes/ShieldProto.unity
   isLoaded: 1
   isActive: 1

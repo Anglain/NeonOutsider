@@ -30,25 +30,52 @@ public class Wall : MonoBehaviour, IRewindable
         gameObject.transform.position = playerPos + displacementVec;
         
         gameObject.transform.up = - dir;
+
+        StartCoroutine(DurationCoroutine(false));
     }
 
 	#region IRewindable members
 
     public void Rewind()
     {
-        throw new System.NotImplementedException();
+        StartCoroutine(DurationCoroutine(true));
     }
 
     public Vector3 UsagePosition()
     {
-        throw new System.NotImplementedException();
+        return this.transform.position;
     }
 
 	 public void Dispose()
     {
-        throw new System.NotImplementedException();
+        Destroy(this.gameObject);
     }
 
 	#endregion
 
+    /// <summary>
+    /// waits for duration seconds, than remember's this skill usage if
+    /// wasRewinded = true, or calls Dispose()
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator DurationCoroutine(bool wasRewinded)
+    {
+        float timer = 0f;
+        while(true)
+        {
+            yield return new WaitForEndOfFrame();
+            timer += Time.deltaTime;
+            if(timer >= duration)
+                break;   
+        }
+        if(wasRewinded)
+        {
+            Dispose();
+        }
+        else
+        {
+            RewindController.Instance.RememberSkillUsage(this);
+            gameObject.SetActive(false);
+        }
+    }
 }

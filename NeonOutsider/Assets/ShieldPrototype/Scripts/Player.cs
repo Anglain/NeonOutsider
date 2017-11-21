@@ -35,8 +35,6 @@ public class Player : MonoBehaviour
 			GameObject wallInstance = Instantiate(wallPrefab, this.transform.position, Quaternion.identity);
 			Wall wallScript = wallInstance.GetComponent<Wall>();
 			wallScript.Place(this.transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
-
-			
 		}
 
 		if(Input.GetKeyDown(KeyCode.F))
