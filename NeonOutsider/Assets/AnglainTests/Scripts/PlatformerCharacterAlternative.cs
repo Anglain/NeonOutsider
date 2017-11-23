@@ -17,6 +17,8 @@ public class PlatformerCharacterAlternative : MonoBehaviour {
 		rb2D = GetComponent<Rigidbody2D>();
 	}
 
+	public GameObject prefab;
+
 	void Update () {
 		if (grounded)
 			doubleJumped = false;
@@ -34,6 +36,11 @@ public class PlatformerCharacterAlternative : MonoBehaviour {
 
 		if (Input.GetKey (KeyCode.D))
 			rb2D.velocity = new Vector2 (moveSpeed, rb2D.velocity.y);
+
+		if (Input.GetKey (KeyCode.E)) {
+			GameObject lazer = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
+			lazer.SetActive (true);
+		}
 	}
 
 	void FixedUpdate () {
