@@ -1,7 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< HEAD:NeonOutsider/Assets/Materials.meta
 guid: 6aed07c3ff151644eae48f8c4ce968f3
 folderAsset: yes
 timeCreated: 1511260638
+=======
+guid: ac384acedb29f40ec8f33e990aaff93e
+folderAsset: yes
+timeCreated: 1510496969
+>>>>>>> master:NeonOutsider/Assets/Materials.meta
 licenseType: Free
 DefaultImporter:
   userData: 
