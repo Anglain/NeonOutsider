@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/ShieldPrototype/Scenes/ShieldProto.unity
-  isLoaded: 1
-  isActive: 1
