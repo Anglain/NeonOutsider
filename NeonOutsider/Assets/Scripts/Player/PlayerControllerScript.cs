@@ -5,7 +5,8 @@ using UnityEngine;
 public class PlayerControllerScript : MonoBehaviour {
 
 	Animator anim;
-
+	
+#region moving and jumping vars
 	//variables for moving
 	public float maxSpeed = 15f;
 	//will help flipping sprite
@@ -28,6 +29,7 @@ public class PlayerControllerScript : MonoBehaviour {
 	public bool crouching;
 
 	Rigidbody2D rb;
+#endregion
 
 	// Use this for initialization
 	void Start () {

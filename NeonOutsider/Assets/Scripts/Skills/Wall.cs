@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Wall : MonoBehaviour, IRewindable 
 {
@@ -13,8 +14,17 @@ public class Wall : MonoBehaviour, IRewindable
 	//    Place(new Vector3(0, 0, 0), new Vector3(2, 1, 0));
     }
 
+    /// <summary>
+    /// This method must be envoked manually after instantiating the prefab
+    /// places wall in right position and with right rotation with respect 
+    /// to player <paramref name="playerPos"> and cursor <paramref name="mousePos">
+    /// </summary>
+    /// <param name="playerPos"></param>
+    /// <param name="mousePos"></param>
     public void Place(Vector3 playerPos, Vector3 mousePos)
     {
+        Assert.IsTrue(gameObject.activeSelf);
+
         playerPos.z = 0f;
         mousePos.z = 0f;    
 
@@ -38,6 +48,7 @@ public class Wall : MonoBehaviour, IRewindable
 
     public void Rewind()
     {
+        gameObject.SetActive(true);
         StartCoroutine(DurationCoroutine(true));
     }
 

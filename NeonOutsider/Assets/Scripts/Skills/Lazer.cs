@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LazerController : MonoBehaviour {
+public class Lazer : MonoBehaviour {
 
 	// Duration of one bullet
 	private float DIFF = .5f;
@@ -19,7 +19,6 @@ public class LazerController : MonoBehaviour {
 	// The max distance of laser (if it reflects, the range reset)
 	public float range = 50f; 
 	public float speed = 50f;
-
 
 	/// <summary>
 	/// Class that srore the point and its direction
@@ -96,9 +95,7 @@ public class LazerController : MonoBehaviour {
 		Shoot(new LineCoordinates(transform.position, transform.up));
 	}
 
-	//
-	//	REWIND PART
-	//
+	#region IRewindable  members
 	LineCoordinates previousShootCoords = new LineCoordinates(Vector2.zero, Vector2.zero);
 
 	Vector3 UsagePosition(){
@@ -112,6 +109,10 @@ public class LazerController : MonoBehaviour {
 		StartCoroutine(RewindShoot(duration, tmp));
 	}
 
+	void Dispose(){
+		// Lazer do it by itself
+	}
+
 	private IEnumerator RewindShoot(float duration, LineCoordinates previousShootCoords){
 		float thisDuration = duration; //to save localy
 		float timer = 0f;
@@ -123,6 +124,7 @@ public class LazerController : MonoBehaviour {
 		}
 		yield break;
 	}
+	#endregion
 
 	float duration; // The last duration of lazer
 	private IEnumerator DurationCalculate(){ // Calculate how long player pressed key (was shooting)
@@ -140,15 +142,10 @@ public class LazerController : MonoBehaviour {
 			duration += Time.deltaTime;
 		}
 	}
-
-	void Dispose(){
-		// Lazer do it by itself
-	}
 		
 	//
 	// SHOOTHING PART
 	//
-
 	void Shoot(LineCoordinates coords){
 		LineCoordinates bulletCoordsStart = new LineCoordinates(coords.coordinates, coords.direction);
 		GameObject lazerBullet = new GameObject();
@@ -244,7 +241,6 @@ public class LazerController : MonoBehaviour {
 			yield return new WaitForFixedUpdate();
 		}
 	}
-
 
 	//
 	// DECORATION PART
