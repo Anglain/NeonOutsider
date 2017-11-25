@@ -22,6 +22,7 @@ public class Shield : MonoBehaviour, IRewindable
 	#region IRewindable members
 	public void Rewind()
 	{
+		gameObject.SetActive(true);
 		// place shield in position where it was used last time
 		this.gameObject.transform.position = turnedOnPosition;
 
@@ -46,8 +47,6 @@ public class Shield : MonoBehaviour, IRewindable
 	/// <param name="deleteOnEnd"></param>
 	private void TurnOnForDuration(bool deleteOnEnd)
 	{
-		this.gameObject.SetActive(true);
-
 		// if spawned near object - stick to it
 		CircleCollider2D collider = gameObject.GetComponent<CircleCollider2D>();
 		Assert.IsNotNull(collider);
@@ -79,10 +78,8 @@ public class Shield : MonoBehaviour, IRewindable
 		{
 			transform.parent = closestGo.transform;
 			transform.position = closestGo.transform.position;	// center it on parent's object
-			// ignore collisions between shield and it's new parent object
-			Collider2D shieldCol = GetComponent<Collider2D>();
-			Collider2D parentCol = closestGo.GetComponent<Collider2D>();
-			Physics2D.IgnoreCollision(shieldCol, parentCol);
+			// start ignoring collisions between shield and it's new parent object
+			SetIsCollisionIgnored(closestGo, true);
 		}
 
 		turnedOnPosition = this.transform.position;
@@ -98,7 +95,6 @@ public class Shield : MonoBehaviour, IRewindable
 			yield return new WaitForEndOfFrame();
 		}
 
-		// stop ignoring collisions with parent
 		if(deleteOnEnd)
 		{
 			Dispose();
@@ -106,11 +102,35 @@ public class Shield : MonoBehaviour, IRewindable
 		else
 		{
 			// unlock from parent gameobject
-			this.gameObject.transform.parent = null;
+			SetIsCollisionIgnored(transform.parent.gameObject, false);
+			transform.parent = null;
 
 			RewindController.Instance.RememberSkillUsage(this);
-			this.gameObject.SetActive(false);
+			gameObject.SetActive(false);
 		}
 	}
 
+	/// <summary>
+	/// sets wether this prefab's collider ignores 
+	/// collisions with all colliders of the go
+	/// </summary>
+	/// <param name="go"></param>
+	/// <param name="isIgnored"></param>
+	/// <returns></returns>
+	bool SetIsCollisionIgnored(GameObject go, bool isIgnored)
+	{
+		Collider2D[] cols = go.GetComponentsInChildren<Collider2D>();
+		
+		if(cols == null)
+			Debug.LogError("Trying to ignore collision betweeen wall and go with no colliders");
+
+
+		Collider2D shieldCol = GetComponent<Collider2D>();
+		foreach (Collider2D goCol in cols)
+		{
+			Physics2D.IgnoreCollision(shieldCol, goCol);
+		}
+
+		return false;
+	}
 }

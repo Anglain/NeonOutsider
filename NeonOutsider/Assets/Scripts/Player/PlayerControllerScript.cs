@@ -1,13 +1,26 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class PlayerControllerScript : MonoBehaviour {
 
+
+#region Skill vars
+
+	public KeyCode shieldKey;
+	public GameObject shieldPrefab;
+	public GameObject wallPrefab;
+	public GameObject lazerPrefab;
+	public RewindTimer rewindTimer;
+	private bool rewindFillStarted;
+
+#endregion
 	Animator anim;
-	
+
 #region moving and jumping vars
-	//variables for moving
+	
 	public float maxSpeed = 15f;
 	//will help flipping sprite
 	bool facingRight = true;
@@ -33,19 +46,110 @@ public class PlayerControllerScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		Assert.IsNotNull(shieldPrefab);
+		Assert.IsNotNull(wallPrefab);
+		// Assert.IsNotNull(lazerPrefab);
+		Assert.IsNotNull(rewindTimer);
+
 		anim = GetComponent<Animator>();
-		rb=GetComponent<Rigidbody2D>();
+		rb = GetComponent<Rigidbody2D>();
 		jumpTimeCounter = jumpTime;
 	}
 
 	void Update(){
 		//checking crouch & jump
-		crouch= Input.GetAxisRaw("Crouch");
+		crouch = Input.GetAxisRaw("Crouch");
 		JumpFunction();
 		CrouchFunction();
+		ResolveForSkillInput();
 	}
 
-	void JumpFunction(){
+    void FixedUpdate () {
+		//checking if grounded and ceiled
+		grounded=Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
+		ceiled=Physics2D.OverlapCircle(ceilingCheck.position, groundRadius, whatIsGround);
+
+		//changing animator settings
+		anim.SetBool("Ground", grounded);
+		anim.SetBool("Crouch", crouching);
+		anim.SetFloat("vSpeed", rb.velocity.y);
+
+		//changing animator settings of speed
+		float move = Input.GetAxis("Horizontal");
+		anim.SetFloat("Speed", Mathf.Abs(move));
+
+		rb.velocity=new Vector2(move * maxSpeed, rb.velocity.y);
+
+		//flipping sprite
+		if (move>0 && facingRight)
+			Flip();
+		else if (move<0 && facingRight)
+			Flip();
+	}
+
+	private void ResolveForSkillInput()
+    {
+        if(Input.GetMouseButtonDown(1))
+		{
+			GameObject wallInstance = Instantiate(wallPrefab, this.transform.position, Quaternion.identity);
+			Wall wallScript = wallInstance.GetComponent<Wall>();
+			wallScript.Place(this.transform.position, Camera.main.ScreenToWorldPoint(Input.mousePosition));
+		}
+
+		if(Input.GetKeyDown(KeyCode.F))
+		{
+			Instantiate(shieldPrefab, this.transform.position, Quaternion.identity);
+		}
+
+		ResolveRewindInput();
+    }
+
+    private void ResolveRewindInput()
+    {
+        // if(Input.GetKeyDown(KeyCode.R))
+		// {
+		// 	if(rewindFillStarted )
+		// 	{
+		// 		if(Input.GetKeyDown(KeyCode.R) == false)	// if user stopped pressing key, rewind
+		// 		{
+		// 			rewindTimer.FinishFill();
+		// 			rewindFillStarted = false;
+		// 		}
+		// 	}
+		// 	else
+		// 	{
+		// 		rewindTimer.StartFill();
+		// 		rewindFillStarted = true;
+		// 	}
+		// }
+		if(RewindController.Instance.HasSkills() == false)	// timer should be hidden, ignore all input 
+		{
+			return;
+		}
+
+		if(Input.GetKeyDown(shieldKey))
+		{
+			Debug.Log(rewindTimer.isActiveAndEnabled);
+			rewindTimer.StartFill();
+		}
+		// if(rewindFillStarted)
+		// {
+		// 	if(Input.GetKey(shieldKey) == false)	// not holding key any more
+		// 	{
+		// 		Debug.Log("Stopped holding key");
+		// 		rewindTimer.FinishFill();
+		// 		rewindFillStarted = false;
+		// 	}
+		// }
+		// else if(Input.GetKeyDown(shieldKey))	// started holding key
+		// {
+		// 	Debug.Log("Started holding key");
+		// 	rewindTimer.StartFill();
+		// 	rewindFillStarted = true;
+		// }		
+    }
+
+    void JumpFunction(){
 		//starting jump
 		if (Input.GetButtonDown("Jump")){
 			if (grounded){
@@ -85,32 +189,6 @@ public class PlayerControllerScript : MonoBehaviour {
 			crouching=false;
 		}
 	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
-		//checking if grounded and ceiled
-		grounded=Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
-		ceiled=Physics2D.OverlapCircle(ceilingCheck.position, groundRadius, whatIsGround);
-
-		//changing animator settings
-		anim.SetBool("Ground", grounded);
-		anim.SetBool("Crouch", crouching);
-		anim.SetFloat("vSpeed", rb.velocity.y);
-
-		//changing animator settings of speed
-		float move = Input.GetAxis("Horizontal");
-		anim.SetFloat("Speed", Mathf.Abs(move));
-
-		rb.velocity=new Vector2(move * maxSpeed, rb.velocity.y);
-
-		//flipping sprite
-		if (move>0 && facingRight)
-			Flip();
-		else if (move<0 && facingRight)
-			Flip();
-	}
-
-
 	void Flip(){
 		facingRight=!facingRight;
 		Vector3 theScale = transform.localScale;

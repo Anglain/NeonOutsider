@@ -39,8 +39,7 @@ public class Player : MonoBehaviour
 
 		if(Input.GetKeyDown(KeyCode.F))
 		{
-			GameObject shieldInstance = Instantiate(shieldPrefab, this.transform.position, Quaternion.identity);
-			// shieldInstance.SetActive(true);	// must set it active from there or the Start will no be called
+			Instantiate(shieldPrefab, this.transform.position, Quaternion.identity);
 		}
 
 		if(Input.GetKeyDown(KeyCode.R))

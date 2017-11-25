@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.UI;
 
 /// <summary>
@@ -13,11 +14,15 @@ public class RewindTimer : MonoBehaviour
     public Image innerImage;
     public float fillDuration;     // time needed to fill whole circle
 
-
-
-    void Start()
+    void Awake()
     {
-        innerImage.fillAmount = 0;
+        Assert.IsNotNull(innerImage);
+    }
+
+    void OnEnable()
+    {
+        Debug.Log("On enable");
+        Reset();
     }
 
    /// <summary>
@@ -27,7 +32,13 @@ public class RewindTimer : MonoBehaviour
    /// </summary>
     public void StartFill()
     {
+        if(RewindController.Instance.HasSkills() == false)
+        {
+            Debug.LogError("started filling timer with no skills in stack!");
+        }
+        // Debug.Log("Started StartFill go is " + gameObject.activeSelf);
         StartCoroutine(FillStartCoroutine());
+        // Debug.Log("Ended StartFill go is " + gameObject.activeSelf);
     }
 
     /// <summary>
@@ -36,6 +47,7 @@ public class RewindTimer : MonoBehaviour
     /// </summary>
     public void FinishFill()
     {
+        Debug.Log("Started StartFill go is " + gameObject.activeSelf);
         StopCoroutine(FillStartCoroutine());
         RewindController.Instance.DuplicateLastSkill();
     }

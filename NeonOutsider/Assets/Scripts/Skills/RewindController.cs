@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 /// <summary>
 /// keeps track of recently used abilities,
@@ -15,12 +16,16 @@ public class RewindController : Singleton<RewindController>
 	protected override void Awake()
 	{
 		base.Awake();
+		Assert.IsNotNull(timer);
 		skillMemory = new LinkedList<IRewindable>();
 	}
+
+	public bool HasSkills(){ return skillMemory.Count != 0; }
 	
 	public void DuplicateLastSkill()
 	{
-		if(skillMemory.Count == 0)
+		// Debug.Log("duplicating skill");
+		if(HasSkills() == false)
 		{
 			Debug.LogError("Called DuplicateLastSkill() with no skills in stack");
 			return;
@@ -30,7 +35,6 @@ public class RewindController : Singleton<RewindController>
 		skillMemory.RemoveFirst();
 
 		lastSkill.Rewind();
-		// Debug.Log("Timer pos : " + timer.transform.position);
 		
 		timer.Reset();
 		if(skillMemory.Count != 0)	//move timer to older skill location
@@ -46,17 +50,18 @@ public class RewindController : Singleton<RewindController>
 	
 	public void RememberSkillUsage(IRewindable skill)
 	{
-		int skillsRemembered = skillMemory.Count;
+		Debug.Log("called RSU skills: " + skillMemory.Count); 
 		skillMemory.AddFirst(skill);
 
 		// place timer in needed location
-		timer.gameObject.transform.position = skill.UsagePosition();
+		timer.transform.position = skill.UsagePosition();
 		// if there where no usages of skill in stack, the timer is hidden
 		timer.gameObject.SetActive(true);
+		Debug.Log(timer.transform.position);
+		Debug.Log(timer.gameObject.activeSelf);		
 
-		if(skillsRemembered >= MAX_USAGE_ENTRIES)
-		{
-			// clean up the gameobject
+		if(skillMemory.Count > MAX_USAGE_ENTRIES)	// forget last
+		{	// clean up the gameobject
 			IRewindable lastSkill = skillMemory.Last.Value;
 			lastSkill.Dispose();
 			skillMemory.RemoveLast();
