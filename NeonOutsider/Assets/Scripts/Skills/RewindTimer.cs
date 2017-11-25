@@ -17,12 +17,13 @@ public class RewindTimer : MonoBehaviour
     void Awake()
     {
         Assert.IsNotNull(innerImage);
+        Reset();
     }
 
     void OnEnable()
     {
-        Debug.Log("On enable");
-        Reset();
+        // Debug.Log("On enable");
+        // Reset();
     }
 
    /// <summary>
@@ -47,8 +48,11 @@ public class RewindTimer : MonoBehaviour
     /// </summary>
     public void FinishFill()
     {
-        Debug.Log("Started StartFill go is " + gameObject.activeSelf);
-        StopCoroutine(FillStartCoroutine());
+        // Don't have the slightest ide why tth FUCK it gives the strangest bug
+        // when stopping coriutine by name
+        // although there is only 1 running 
+        StopAllCoroutines();
+        // StopCoroutine(FillStartCoroutine());
         RewindController.Instance.DuplicateLastSkill();
     }
 
@@ -62,11 +66,14 @@ public class RewindTimer : MonoBehaviour
     
     private IEnumerator FillStartCoroutine()
     {
+        Debug.Log("fill routine");
         while(innerImage.fillAmount < 1.0f)
         {
             innerImage.fillAmount +=  (Time.deltaTime / fillDuration);
             yield return new WaitForEndOfFrame();
         }
+
+        Debug.Log("coroutine did not stop!");
         RewindController.Instance.DuplicateLastSkill();
     }
 }

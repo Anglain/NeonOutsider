@@ -24,7 +24,7 @@ public class Shield : MonoBehaviour, IRewindable
 	{
 		gameObject.SetActive(true);
 		// place shield in position where it was used last time
-		this.gameObject.transform.position = turnedOnPosition;
+		transform.position = turnedOnPosition;
 
 		TurnOnForDuration(true);
 	}

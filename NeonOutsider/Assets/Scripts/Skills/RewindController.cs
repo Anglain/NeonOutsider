@@ -50,15 +50,12 @@ public class RewindController : Singleton<RewindController>
 	
 	public void RememberSkillUsage(IRewindable skill)
 	{
-		Debug.Log("called RSU skills: " + skillMemory.Count); 
 		skillMemory.AddFirst(skill);
 
 		// place timer in needed location
 		timer.transform.position = skill.UsagePosition();
 		// if there where no usages of skill in stack, the timer is hidden
 		timer.gameObject.SetActive(true);
-		Debug.Log(timer.transform.position);
-		Debug.Log(timer.gameObject.activeSelf);		
 
 		if(skillMemory.Count > MAX_USAGE_ENTRIES)	// forget last
 		{	// clean up the gameobject

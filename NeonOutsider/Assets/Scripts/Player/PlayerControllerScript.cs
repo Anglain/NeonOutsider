@@ -106,35 +106,28 @@ public class PlayerControllerScript : MonoBehaviour {
 
     private void ResolveRewindInput()
     {
-        // if(Input.GetKeyDown(KeyCode.R))
-		// {
-		// 	if(rewindFillStarted )
-		// 	{
-		// 		if(Input.GetKeyDown(KeyCode.R) == false)	// if user stopped pressing key, rewind
-		// 		{
-		// 			rewindTimer.FinishFill();
-		// 			rewindFillStarted = false;
-		// 		}
-		// 	}
-		// 	else
-		// 	{
-		// 		rewindTimer.StartFill();
-		// 		rewindFillStarted = true;
-		// 	}
-		// }
 		if(RewindController.Instance.HasSkills() == false)	// timer should be hidden, ignore all input 
 		{
 			return;
 		}
 
-		if(Input.GetKeyDown(shieldKey))
+
+		if(!rewindFillStarted && Input.GetKeyDown(shieldKey))
 		{
-			Debug.Log(rewindTimer.isActiveAndEnabled);
 			rewindTimer.StartFill();
+			rewindFillStarted = true;
 		}
+		if(rewindFillStarted && Input.GetKeyUp(shieldKey))
+		{
+			rewindTimer.FinishFill();
+			rewindFillStarted = false;
+		}
+
+
+
 		// if(rewindFillStarted)
 		// {
-		// 	if(Input.GetKey(shieldKey) == false)	// not holding key any more
+		// 	if(Input.GetKeyUp(shieldKey))	// not holding key any more
 		// 	{
 		// 		Debug.Log("Stopped holding key");
 		// 		rewindTimer.FinishFill();
