@@ -18,6 +18,9 @@ public class PlatformerCharacterAlternative : MonoBehaviour {
 	}
 
 	public GameObject prefab;
+	private GameObject lazer;
+
+	public bool shooted = false;
 
 	void Update () {
 		if (grounded)
@@ -37,9 +40,25 @@ public class PlatformerCharacterAlternative : MonoBehaviour {
 		if (Input.GetKey (KeyCode.D))
 			rb2D.velocity = new Vector2 (moveSpeed, rb2D.velocity.y);
 
-		if (Input.GetKey (KeyCode.E)) {
-			GameObject lazer = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
+
+
+		if (Input.GetKey (KeyCode.E) && !shooted) {
+			shooted = true;
+			lazer = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
 			lazer.SetActive (true);
+			lazer.GetComponent<LazerController>().UpShoot ();
+		}
+
+		if (Input.GetKey (KeyCode.R) && shooted) {
+			Debug.Log ("rewind");
+			shooted = false;
+			lazer.SetActive (true);
+			lazer.GetComponent<LazerController>().Rewind ();
+		}
+
+		if (Input.GetKey (KeyCode.L)) {
+			lazer.GetComponent<LazerController> ().Dispose ();
+			lazer = null;
 		}
 	}
 
