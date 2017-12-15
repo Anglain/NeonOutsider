@@ -39,17 +39,37 @@ public class Lazer : MonoBehaviour {
 
 	private KeyCode pressed = KeyCode.None;
 
-	void FixedUpdate () {
-		if ((Input.GetKey (frontShootKey)) && !isShooting) { 
+	/// <summary>
+	/// This method must be envoked manually after instantiating the prefab
+    /// starts the lazer shooting mechanism in the front direction of player
+	/// </summary>
+	public void AttemptShootFront(){
+		if ((Input.GetKey (frontShootKey)) && !isShooting) {
 			isShooting = true;
 			RightShoot ();
 			StartCoroutine (Timer(DIFF - .05f));
 		}
+	}
+
+	/// <summary>
+	/// This method must be envoked manually after instantiating the prefab
+    /// starts the lazer shooting mechanism in the upwards direction of player
+	/// </summary>
+	public void AttemptShootUp(){
 		if ((Input.GetKey (upShootKey))&& !isShooting ) {
+		
 			isShooting = true;
 			UpShoot ();
 			StartCoroutine (Timer(DIFF - .05f));
 		}
+			
+	}
+
+	void FixedUpdate() {
+		 
+			
+		
+			
 
 		if ((Input.GetKey (rewindKey)) && previousShootCoords.coordinates != Vector2.zero) {
 				Rewind ();
@@ -66,7 +86,7 @@ public class Lazer : MonoBehaviour {
 			StartCoroutine ( DurationCalculate());
 		}
 
-		if (Input.GetKeyUp (pressed)) {
+		if (Input.GetKeyUp (pressed)) { 
 			keyUp = true;
 		}
 	}
@@ -110,15 +130,19 @@ public class Lazer : MonoBehaviour {
 	}
 
 	void Dispose(){
-		// Lazer do it by itself
+		// Lazer do it by itself - IT DOES NOT
+
 	}
 
 	private IEnumerator RewindShoot(float duration, LineCoordinates previousShootCoords){
 		float thisDuration = duration; //to save localy
 		float timer = 0f;
+
 		while (timer <= duration){
+
 			Shoot (previousShootCoords);
 			yield return new WaitForSeconds(DIFF - .05f);
+
 			timer += (DIFF - .05f) + Time.deltaTime;
 			print (duration + " t: " + timer);
 		}
